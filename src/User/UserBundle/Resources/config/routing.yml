@@ -1,3 +1,3 @@
 user_user_homepage:
     path:     /
-    defaults: { _controller: UserUserBundle:Default:login }
+    defaults: { _controller: UserUserBundle:User:login }

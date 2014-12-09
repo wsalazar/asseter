@@ -10,26 +10,26 @@ namespace User\UserBundle\Entity;
 
 
 class Login {
-    protected $task;
-    protected $dueDate;
+    protected $email;
+    protected $passcode;
 
-    public function getTask()
+    public function getEmail()
     {
-        return $this->task;
+        return $this->email;
     }
 
-    public function setTask($task)
+    public function setEmail($email)
     {
-        $this->task = $task;
+        $this->email = $email;
     }
 
-    public function getDueDate()
+    public function getPasscode()
     {
-        return $this->dueDate;
+        return $this->passcode;
     }
 
-    public function setDueDate(\DateTime $dueDate = null)
+    public function setPasscode($passcode)
     {
-        $this->dueDate = $dueDate;
+        $this->passcode = $passcode;
     }
 } 
