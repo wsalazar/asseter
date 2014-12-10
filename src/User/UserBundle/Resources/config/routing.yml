@@ -1,3 +1,7 @@
 user_user_homepage:
     path:     /
     defaults: { _controller: UserUserBundle:User:login }
+
+user_dashboard:
+    path: /dashboard
+    defaults: { _controller: AsseterDashboardBundle:Asseter:index }
