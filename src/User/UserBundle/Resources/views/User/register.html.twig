@@ -1,0 +1,39 @@
+{% extends 'UserUserBundle::layout.html.twig' %}
+
+{% block body %}
+    <form action="{{ path('user_dashboard') }}" method="post" {{ form_enctype(register) }} >
+        {{ form_start(register) }}
+        {{ form_errors(register) }}
+        <div>
+            {{ form_label(register.firstName) }}
+            {{ form_errors(register.firstName) }}
+            {{ form_widget(register.firstName) }}
+        </div>
+        <div>
+            {{ form_label(register.lastName) }}
+            {{ form_errors(register.lastName) }}
+            {{ form_widget(register.lastName) }}
+        </div>
+        <div>
+            {{ form_label(register.username) }}
+            {{ form_errors(register.username) }}
+            {{ form_widget(register.username) }}
+        </div>
+        <div>
+            {{ form_label(register.passcode) }}
+            {{ form_errors(register.passcode) }}
+            {{ form_widget(register.passcode) }}
+        </div>
+        <div>
+            {{ form_widget(register.save) }}
+        </div>
+        {{ form_end(register) }}
+        <a href="{{ path('user_user_homepage') }}" id="login">Back to Login</a>
+
+        {#background: none repeat scroll 0 0 #448df6;#}
+        {#border: 3px solid #448df6;#}
+        {#color: #14c65e;#}
+        {#float: left;#}
+        {#margin-right: 10px;#}
+    </form>
+{% endblock %}

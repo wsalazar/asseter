@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
+    <title>{% block title %}Asseter{% endblock %}</title>
+    <link href=" {{ asset('bundles/assets/css/bootstrap.css') }}" rel="stylesheet" />
+    <link href=" {{ asset('bundles/assets/css/bootstrap-theme.css')  }}" rel="stylesheet" />
+    <link href=" {{ asset('bundles/assets/css/font-awesome.css') }}" rel="stylesheet" />
+    {#<link href=" {{ asset('css/bootstrap.css') }}" rel="stylesheet" />#}
+    {#<link href=" {{ asset('css/bootstrap-theme.css')  }}" rel="stylesheet" />#}
+    {#<link href=" {{ asset('css/font-awesome.css') }}" rel="stylesheet" />#}
+    {% block stylesheets %}{% endblock %}
+    {#{% stylesheets '/web/assets/css/*' filter='cssrewrite'  %}#}
+    {#<link href="{{ asset('/bower_components/font-awesome/css/font-awesome.css') }}" type="text/css" rel="stylesheet" />#}
+    {#<link href="{{ asset('bower_components/bootstrap/dist/css/bootstrap.css') }}" type="text/css" rel="stylesheet" />#}
+    {#<link href="{{ asset_url }}" rel="stylesheet" />#}
+    {#{% endstylesheets %}#}
+</head>
+<header>Asseter</header>
+<body>
+{% block body %}{% endblock %}
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+    <script type="text/javascript" >
+        $( document ).ready(function() {
+            $('#register #login').on('click',function(e){
+                e.preventDefault();
+            });
+//            $('#login').on('click',function(e){
+//                e.preventDefault();
+//            });
+        });
+    </script>
+{% block javascripts %}{% endblock %}
+</body>
+</html>
