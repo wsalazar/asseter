@@ -9,3 +9,7 @@ user_dashboard:
 user_register:
     path:     /register
     defaults: { _controller: UserUserBundle:User:register }
+
+user_register_submit:
+    path:    /register/user
+    defaults: { _controller: UserUserBundle:User:registerUser }

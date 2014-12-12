@@ -8,29 +8,99 @@
 
 namespace User\UserBundle\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
+/**
+ * @ORM\Entity @ORM\Table(name="users")
+ */
 
 class User {
 
     /**
+     * @ORM\id @ORM\Column(type="integer") @ORM\GeneratedValue
+     * @var int
+     */
+    protected $id;
+
+    /**
+     * @ORM\Column(type="string")
+     * @Assert\NotBlank()
+     * @Assert\Email()
      * @var $firstName string
      */
     protected $firstName;
 
     /**
+     * @ORM\Column(type="string")
+     * @Assert\NotBlank()
      * @var $lastName string
      */
     protected $lastName;
 
     /**
+     * @ORM\Column(type="string")
+     * @Assert\NotBlank()
      * @var $email string
      */
 //    protected $email;
     protected $username;
 
     /**
+     * @ORM\Column(type="string")
+     * @Assert\NotBlank()
      * @var $passcode string
      */
     protected $passcode;
+
+    /**
+     * @var
+     */
+    protected $salt;
+
+    public function __construct(
+        $firstName,
+        $lastName,
+        $username,
+        $passcode
+    )
+    {
+        if ( is_null($firstName) ) {
+            throw new \InvalidArgumentException('First Name must not be empty');
+        }
+        $this->setFirstName($firstName);
+        if ( is_null($lastName) ) {
+            throw new \InvalidArgumentException('Last Name must not be empty');
+        }
+        $this->setLastName($lastName);
+        if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
+            throw new \InvalidArgumentException('Not a valid email address.');
+        }
+        if ( is_null($username) ) {
+            throw new \InvalidArgumentException('Email must not be empty.');
+        }
+        $this->setUsername($username);
+        if ( is_null($passcode) ) {
+            throw new \InvalidArgumentException('Password must not be empty');
+        }
+        $this->setPasscode($passcode);
+    }
+
+    /**
+     * @param $salt
+     */
+    public function setSalt($salt)
+    {
+        $this->salt = $salt;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSalt()
+    {
+        return $this->salt;
+    }
 
     /**
      * @param string $firstName

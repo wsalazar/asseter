@@ -67,3 +67,16 @@ swiftmailer:
     username:  "%mailer_user%"
     password:  "%mailer_password%"
     spool:     { type: memory }
+
+services:
+    user_factory:
+        class: User\UserBundle\Entity\User\UserFactory
+        arguments: [user]
+
+    sha256salted_encoder:
+        class: User\UserBundle\Service\Sha256Salted
+
+    database_manager:
+        class: User\UserBundle\Service\DatabaseManager
+        arguments:
+                entityManager: "@doctrine.orm.entity_manager"

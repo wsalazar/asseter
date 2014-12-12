@@ -1,7 +1,7 @@
 {% extends 'UserUserBundle::layout.html.twig' %}
 
 {% block body %}
-    <form action="{{ path('user_dashboard') }}" method="post" {{ form_enctype(register) }} >
+    <form action="{{ path('user_register_submit') }}" method="post" {{ form_enctype(register) }} >
         {{ form_start(register) }}
         {{ form_errors(register) }}
         <div>
@@ -25,9 +25,9 @@
             {{ form_widget(register.passcode) }}
         </div>
         <div>
-            {{ form_widget(register.save) }}
+            {{ form_widget(register.register_user) }}
         </div>
-        {{ form_end(register) }}
+        {#{{ form_end(register) }}#}
         <a href="{{ path('user_user_homepage') }}" id="login">Back to Login</a>
 
         {#background: none repeat scroll 0 0 #448df6;#}
