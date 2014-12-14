@@ -31,13 +31,9 @@ class UserController extends Controller
      */
     public function registerAction(Request $request)
     {
-//        $user = new User();
         $registerUser = $this->createForm(new UserType);
         $registerUser->handleRequest($request);
-        return $this->render(
-                        'UserUserBundle:User:register.html.twig',
-                        ['register'=> $registerUser->createView()]
-                        );
+        return $this->render('UserUserBundle:User:register.html.twig',['user'=> $registerUser->createView()]);
     }
 
     /**
@@ -45,14 +41,42 @@ class UserController extends Controller
      */
     public function registerUserAction(Request $request)
     {
-        if ($request->isMethod('POST')) {
-            $user = $request->request->all();
+        $form = $this->createForm(new UserType());
+        $form->submit($request->request->all());
+        if ( $form->isValid() ) {
             $createUser = $this->get('user_factory');
             $encoder = $this->get('sha256salted_encoder');
-            $createdUser = $createUser->createUser($user['user'], $encoder);
             $db = $this->get('database_manager');
-            $createUser->persist($createdUser, $db);
-            die();
+            if ($this->get('user_manager')->createUser($createUser, $form->getData(), $encoder, $db) ) {
+                $this->get('session')->getFlashBag()->add('notice', 'You have an asseter account!');
+                return $this->redirect($this->generateUrl('user_register'));
+            }
         }
+        foreach ( $this->getErrorMessages($form) as $errors ) {
+            foreach ( $errors as $error ) {
+                $this->get('session')->getFlashBag()->add('notice', $error);
+            }
+        }
+        return $this->redirect($this->generateUrl('user_register'));
+    }
+
+    /**
+     * @param \Symfony\Component\Form\Form $form
+     * @return array
+     */
+    private function getErrorMessages(\Symfony\Component\Form\Form $form)
+    {
+        $errors = array();
+        foreach ($form->getErrors() as $key => $error) {
+            $errors[] = $error->getMessage();
+        }
+
+        foreach ($form->all() as $child) {
+            if (!$child->isValid()) {
+                $errors[$child->getName()] = $this->getErrorMessages($child);
+            }
+        }
+
+        return $errors;
     }
 }

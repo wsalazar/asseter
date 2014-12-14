@@ -1,33 +1,24 @@
 {% extends 'UserUserBundle::layout.html.twig' %}
 
 {% block body %}
-    <form action="{{ path('user_register_submit') }}" method="post" {{ form_enctype(register) }} >
-        {{ form_start(register) }}
-        {{ form_errors(register) }}
+    <form action="{{ path('user_register_submit') }}" method="post" {{ form_enctype(user) }} >
+        <ul>
+        {% for flashMessage in app.session.flashbag.get('notice') %}
+            <li>{{ flashMessage }}</li>
+        {% endfor %}
+        </ul>
         <div>
-            {{ form_label(register.firstName) }}
-            {{ form_errors(register.firstName) }}
-            {{ form_widget(register.firstName) }}
+            <label for="firstName">First Name: </label><input id="firstName" name="firstName" type="text" />
+            <label for="lastName">Last Name: </label><input id="lastName" name="lastName" type="text"  />
         </div>
         <div>
-            {{ form_label(register.lastName) }}
-            {{ form_errors(register.lastName) }}
-            {{ form_widget(register.lastName) }}
+            <label for="email">E-mail: </label><input id="email" name="email" type="email"  />
+            <label for="passcode">Passcode: </label><input id="passcode" name="passcode" type="password"  />
         </div>
         <div>
-            {{ form_label(register.username) }}
-            {{ form_errors(register.username) }}
-            {{ form_widget(register.username) }}
+            <input type="hidden" name="_token" value="{{ csrf_token('user') }}">
+            <input id="register" name="register" value="Register" type="submit" />
         </div>
-        <div>
-            {{ form_label(register.passcode) }}
-            {{ form_errors(register.passcode) }}
-            {{ form_widget(register.passcode) }}
-        </div>
-        <div>
-            {{ form_widget(register.register_user) }}
-        </div>
-        {#{{ form_end(register) }}#}
         <a href="{{ path('user_user_homepage') }}" id="login">Back to Login</a>
 
         {#background: none repeat scroll 0 0 #448df6;#}

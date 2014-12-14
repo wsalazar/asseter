@@ -3,9 +3,9 @@
 {% block body %}
 <form action="{{ path('user_dashboard') }}" method="post" {{ form_enctype(userLogin) }} >
         <div>
-            {{ form_label(userLogin.username) }}
-            {{ form_errors(userLogin.username) }}
-            {{ form_widget(userLogin.username) }}
+            {{ form_label(userLogin.email) }}
+            {{ form_errors(userLogin.email) }}
+            {{ form_widget(userLogin.email) }}
         </div>
         <div>
             {{ form_label(userLogin.passcode) }}
@@ -16,6 +16,7 @@
             {{ form_widget(userLogin.login) }}
             <a href="{{ path('user_register') }}" id="register">Register</a>
         </div>
+        {#{{ form_rest(userLogin) }}#}
 
     {#background: none repeat scroll 0 0 #448df6;#}
     {#border: 3px solid #448df6;#}

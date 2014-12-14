@@ -83,6 +83,10 @@ class User {
         if ( is_null($passcode) ) {
             throw new \InvalidArgumentException('Password must not be empty');
         }
+
+        if ( strlen($passcode) < 5 ) {
+            throw new \InvalidArgumentException('Password must be longer than 5 characters');
+        }
         $this->setPasscode($passcode);
     }
 

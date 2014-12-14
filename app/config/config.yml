@@ -73,6 +73,10 @@ services:
         class: User\UserBundle\Entity\User\UserFactory
         arguments: [user]
 
+    user_manager:
+            class: User\UserBundle\Entity\User\UserManager
+#            arguments: [user]
+
     sha256salted_encoder:
         class: User\UserBundle\Service\Sha256Salted
 

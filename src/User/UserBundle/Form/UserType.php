@@ -10,6 +10,9 @@ namespace User\UserBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class UserType extends AbstractType
 {
@@ -20,12 +23,49 @@ class UserType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('username','email' , ['label' => 'E-Mail: '])
-            ->add('passcode','password',['label'=>'Passcode: '])
-            ->add('firstName','text' ,['label'=>'First Name: '])
-            ->add('lastName','text' ,['label'=>'Last Name: '])
-            ->add('login','submit',['label'=>'Login','attr'=>['class'=>'fa fa-arrow-right']])
-            ->add('register_user','submit',['label'=>'Register','attr'=>['class'=>'fa fa-arrow-right']]);
+            ->add('email','email' , [
+                                    'constraints' => [
+                                        new Length([
+                                        'min'   =>  7,
+                                        ])
+                                        ],
+                                    ])
+            ->add('passcode','password',[
+                                     'constraints' => [
+                                         new Length([
+                                        'min'   =>  5,
+                                        'max'   =>  25,
+                                        ])
+                                        ],
+                                    ])
+            ->add('firstName','text',[
+                                    'constraints' => [
+                                        new Length([
+                                            'min'   =>  1,
+                                            'max'   =>  50,
+                                        ])
+                                        ],
+                                    ])
+            ->add('lastName','text',[
+                                    'constraints' => [
+                                        new Length([
+                                            'min'   =>  1,
+                                            'max'   =>  50,
+                                        ])
+                                    ],
+                                    ])
+            ->add('login','submit',['attr'=>['class'=>'fa fa-arrow-right']])
+            ->add('register','submit',['attr'=>['class'=>'fa fa-arrow-right']]);
+    }
+
+    /**
+     * @param OptionsResolverInterface $resolver
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(array(
+            'intention' => 'user'
+        ));
     }
 
     /**
