@@ -15,7 +15,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity @ORM\Table(name="users")
  */
 
-class User {
+class User
+{
 
     /**
      * @ORM\id @ORM\Column(type="integer") @ORM\GeneratedValue
@@ -24,10 +25,10 @@ class User {
     protected $id;
 
     /**
+     * @var string $firstName
      * @ORM\Column(type="string")
      * @Assert\NotBlank()
      * @Assert\Email()
-     * @var $firstName string
      */
     protected $firstName;
 
@@ -43,7 +44,6 @@ class User {
      * @Assert\NotBlank()
      * @var $email string
      */
-//    protected $email;
     protected $username;
 
     /**
@@ -54,16 +54,18 @@ class User {
     protected $encodedPasscode;
 
     /**
-     * @var
+     * @var $salt string
      */
     protected $salt;
 
-    public function __construct(
-        $firstName,
-        $lastName,
-        $username,
-        $passcode
-    )
+    /**
+     * @param string $firstName
+     * @param string $lastName
+     * @param string $username
+     * @param string $passcode
+     * @throws \InvalidArgumentException
+     */
+    public function __construct($firstName, $lastName, $username, $passcode)
     {
         if ( is_null($firstName) ) {
             throw new \InvalidArgumentException('First Name must not be empty');
@@ -91,7 +93,7 @@ class User {
     }
 
     /**
-     * @param $salt
+     * @param string $salt
      */
     public function setSalt($salt)
     {
@@ -115,7 +117,7 @@ class User {
     }
 
     /**
-     * @return string
+     * @return string firstName
      */
     public function getFirstName()
     {

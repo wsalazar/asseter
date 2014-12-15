@@ -8,6 +8,10 @@ use User\UserBundle\Entity\User;
 use User\UserBundle\Form\UserType;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
+/**
+ * Class UserController
+ * @package User\UserBundle\Controller
+ */
 class UserController extends Controller
 {
 
@@ -19,12 +23,17 @@ class UserController extends Controller
     {
         $loginForm = $this->createForm(new UserType);
         $loginForm->handleRequest($request);
+
         return $this->render(
-                            'UserUserBundle:User:new.html.twig',
-                            ['user'=> $loginForm->createView()]
-                            );
+            'UserUserBundle:User:new.html.twig',
+            ['user'=> $loginForm->createView()]
+        );
     }
 
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function userSubmitAction(Request $request)
     {
         $form = $this->createForm(new UserType());
@@ -42,12 +51,13 @@ class UserController extends Controller
             }
         }
         if ( $this->getErrorMessages($form) ) {
-            foreach ( $this->getErrorMessages($form) as $errors ) {
-                foreach ( $errors as $error ) {
+            foreach ($this->getErrorMessages($form) as $errors) {
+                foreach ($errors as $error) {
                     $this->get('session')->getFlashBag()->add('notice', $error);
                 }
             }
         }
+
         return $this->redirect($this->generateUrl('user_user_homepage'));
     }
 
@@ -59,7 +69,8 @@ class UserController extends Controller
     {
         $registerUser = $this->createForm(new UserType);
         $registerUser->handleRequest($request);
-        return $this->render('UserUserBundle:User:register.html.twig',['user'=> $registerUser->createView()]);
+
+        return $this->render('UserUserBundle:User:register.html.twig', ['user'=> $registerUser->createView()]);
     }
 
     /**
@@ -75,16 +86,18 @@ class UserController extends Controller
             $userManager = $this->get('user_manager');
             if ($userManager->createUser($form->getData(), $encoder) ) {
                 $this->get('session')->getFlashBag()->add('notice', 'You have an asseter account!');
+
                 return $this->redirect($this->generateUrl('user_register'));
             }
         }
         if ( $this->getErrorMessages($form) ) {
-            foreach ( $this->getErrorMessages($form) as $errors ) {
-                foreach ( $errors as $error ) {
+            foreach ($this->getErrorMessages($form) as $errors) {
+                foreach ($errors as $error) {
                     $this->get('session')->getFlashBag()->add('notice', $error);
                 }
             }
         }
+
         return $this->redirect($this->generateUrl('user_register'));
     }
 

@@ -15,6 +15,10 @@ use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder as PasswordEncoder;
 use User\UserBundle\Service\Encoder;
 
+/**
+ * Class UserManager
+ * @package User\UserBundle\Entity\User
+ */
 class UserManager
 {
     /**
@@ -29,7 +33,7 @@ class UserManager
 
     /**
      * @param DatabaseManager $db
-     * @param UserFactory $userFactory
+     * @param UserFactory     $userFactory
      */
     public function __construct(DatabaseManager $db, UserFactory $userFactory)
     {
@@ -38,7 +42,7 @@ class UserManager
     }
 
     /**
-     * @param $user
+     * @param array                            $user
      * @param \User\UserBundle\Service\Encoder $encoder
      * @throws \Symfony\Component\Form\Exception\AlreadySubmittedException
      * @internal param \User\UserBundle\Entity\User\UserFactory $createUser
@@ -51,12 +55,13 @@ class UserManager
         $user['encoded_passcode'] = $encoder->encode($passcode, null);
         unset($user['passcode']);
         $createdUser = $this->_userFactory->create($user);
-        if( $this->isUserExists($createdUser) ) {
-            throw new AlreadySubmittedException(sprintf('User: %s already exists.', $createdUser->getUsername() ) );
+        if ( $this->isUserExists($createdUser) ) {
+            throw new AlreadySubmittedException(sprintf('User: %s already exists.', $createdUser->getUsername()));
         }
         $em = $this->_db->getEntityManager();
         $em->persist($createdUser);
         $em->flush();
+
         return true;
     }
 
@@ -70,16 +75,17 @@ class UserManager
         $em = $this->_db->getEntityManager();
         $query = $em->createQueryBuilder()
             ->select('u.username')
-            ->from('UserUserBundle:User','u')
+            ->from('UserUserBundle:User', 'u')
             ->where('u.username = :user_name')
-            ->setParameter('user_name',$user->getUsername())
+            ->setParameter('user_name', $user->getUsername())
             ->getQuery();
+
         return count($query->execute()) > 0 ? true : false ;
 
     }
 
     /**
-     * @param $user
+     * @param array $user
      * @return mixed|null
      */
     public function fetchUser($user)
@@ -87,22 +93,24 @@ class UserManager
         $em = $this->_db->getEntityManager();
         $query = $em->createQueryBuilder()
             ->select('u.encodedPasscode')
-            ->from('UserUserBundle:User','u')
+            ->from('UserUserBundle:User', 'u')
             ->where('u.username = :user_name')
-            ->setParameter('user_name',$user['email'])
+            ->setParameter('user_name', $user['email'])
             ->getQuery();
+
         return count($query->execute()) > 0 ? $query->execute() : null ;
     }
 
     /**
      * @param Encoder $encoder
-     * @param $queriedUser
-     * @param $submittedUser
+     * @param array   $queriedUser
+     * @param array   $submittedUser
      * @return bool
      */
     public function verifyPasscode(Encoder $encoder, $queriedUser, $submittedUser )
     {
-        return $encoder->isPasswordValid((string)$queriedUser[0]['encodedPasscode'], (string)trim($submittedUser['passcode']));
+
+        return $encoder->isPasswordValid((string) $queriedUser[0]['encodedPasscode'], (string) trim($submittedUser['passcode']));
     }
 
 }

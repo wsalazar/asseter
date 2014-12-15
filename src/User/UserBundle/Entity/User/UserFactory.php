@@ -10,6 +10,10 @@ namespace User\UserBundle\Entity\User;
 
 use User\UserBundle\Entity\User;
 
+/**
+ * Class UserFactory
+ * @package User\UserBundle\Entity\User
+ */
 class UserFactory
 {
     /**

@@ -14,31 +14,35 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * Class UserType
+ * @package User\UserBundle\Form
+ */
 class UserType extends AbstractType
 {
     /**
      * @param FormBuilderInterface $builder
-     * @param array $options
+     * @param array                $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('email','email' , [
+            ->add('email', 'email', [
                                     'constraints' => [
                                         new Length([
-                                        'min'   =>  7,
+                                                     'min'   =>  7,
                                         ])
                                         ],
                                     ])
-            ->add('passcode','password',[
+            ->add('passcode', 'password', [
                                      'constraints' => [
                                          new Length([
-                                        'min'   =>  5,
-                                        'max'   =>  25,
-                                        ])
+                                                      'min'   =>  5,
+                                                      'max'   =>  25,
+                                         ])
                                         ],
                                     ])
-            ->add('firstName','text',[
+            ->add('firstName', 'text', [
                                     'constraints' => [
                                         new Length([
                                             'min'   =>  1,
@@ -46,7 +50,7 @@ class UserType extends AbstractType
                                         ])
                                         ],
                                     ])
-            ->add('lastName','text',[
+            ->add('lastName', 'text', [
                                     'constraints' => [
                                         new Length([
                                             'min'   =>  1,
@@ -54,8 +58,8 @@ class UserType extends AbstractType
                                         ])
                                     ],
                                     ])
-            ->add('login','submit',['attr'=>['class'=>'fa fa-arrow-right']])
-            ->add('register','submit',['attr'=>['class'=>'fa fa-arrow-right']]);
+            ->add('login', 'submit', ['attr'=>['class'=>'fa fa-arrow-right']])
+            ->add('register', 'submit', ['attr'=>['class'=>'fa fa-arrow-right']]);
     }
 
     /**

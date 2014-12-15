@@ -10,6 +10,10 @@ namespace User\UserBundle\Service;
 
 use Doctrine\ORM\EntityManager;
 
+/**
+ * Class DatabaseManager
+ * @package User\UserBundle\Service
+ */
 class DatabaseManager
 {
     /**

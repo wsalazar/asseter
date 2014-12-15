@@ -10,14 +10,21 @@ namespace User\UserBundle\Service;
 
 use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
 
+/**
+ * Class Encoder
+ * @package User\UserBundle\Service
+ */
 class Encoder extends BCryptPasswordEncoder
 {
 
     /**
-     * @var $salt string
+     * @var string $salt
      */
     protected $salt;
 
+    /**
+     * @param int $cost
+     */
     public function __construct($cost)
     {
         parent::__construct($cost);
@@ -35,7 +42,7 @@ class Encoder extends BCryptPasswordEncoder
     /**
      * @param string $encoded
      * @param string $raw
-     * @param null $salt
+     * @param null   $salt
      * @return bool
      */
     public function isPasswordValid($encoded, $raw, $salt = null)
@@ -44,13 +51,16 @@ class Encoder extends BCryptPasswordEncoder
     }
 
     /**
-     * @param $salt
+     * @param string $salt
      */
     public function setSalt($salt)
     {
         $this->salt = $salt;
     }
 
+    /**
+     * @return string
+     */
     public function getSalt()
     {
         return $this->salt;
