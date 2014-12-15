@@ -3,6 +3,14 @@ parameters:
 #    user_user.example.class: User\UserBundle\Example
 
 services:
+     user_register_email:
+        class: User\UserBundle\Service\EmailRegisterService
+
+#        arguments: ["@user_user"]
+
+#     user_user:
+#        class: User\UserBundle\Entity\User
+#        arguments: [firstName, lastName, username, passcode, verificationCode]
 #    user_user.example:
 #        class: %user_user.example.class%
 #        arguments: [@service_id, "plain_value", %parameter%]

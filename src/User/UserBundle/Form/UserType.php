@@ -58,6 +58,14 @@ class UserType extends AbstractType
                                         ])
                                     ],
                                     ])
+            ->add('verificationCode', 'text', [
+                                    'constraints' => [
+                                        new Length([
+                                            'min'   =>  1,
+                                            'max'   =>  20,
+                                        ])
+                                    ],
+                                    ])
             ->add('login', 'submit', ['attr'=>['class'=>'fa fa-arrow-right']])
             ->add('register', 'submit', ['attr'=>['class'=>'fa fa-arrow-right']]);
     }

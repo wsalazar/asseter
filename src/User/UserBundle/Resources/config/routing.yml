@@ -17,3 +17,7 @@ user_register:
 user_register_submit:
     path:  /register/user
     defaults: { _controller: UserUserBundle:User:registerUser }
+
+user_register_verification:
+    path:  /register/verification-code/{verification_code}
+    defaults: { _controller: UserUserBundle:User:registerVerification }

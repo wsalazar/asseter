@@ -42,7 +42,7 @@ class User
     /**
      * @ORM\Column(type="string")
      * @Assert\NotBlank()
-     * @var $email string
+     * @var $username string
      */
     protected $username;
 
@@ -59,13 +59,26 @@ class User
     protected $salt;
 
     /**
+     * @ORM\Column(type="string")
+     * @Assert\NotBlank()
+     * @var $verificationCode string
+     */
+    protected $verificationCode;
+
+    /**
+     * @ORM\Column(type="integer")
+     * @var
+     */
+    protected $active;
+
+    /**
      * @param string $firstName
      * @param string $lastName
      * @param string $username
      * @param string $passcode
      * @throws \InvalidArgumentException
      */
-    public function __construct($firstName, $lastName, $username, $passcode)
+    public function __construct($firstName, $lastName, $username, $passcode, $verificationCode)
     {
         if ( is_null($firstName) ) {
             throw new \InvalidArgumentException('First Name must not be empty');
@@ -90,6 +103,56 @@ class User
             throw new \InvalidArgumentException('Password must be longer than 5 characters');
         }
         $this->setEncodedPasscode($passcode);
+        $this->setVerificationCode($verificationCode);
+        $this->setActive(0);
+    }
+
+    /**
+     * @param mixed $active
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getActive()
+    {
+        return $this->active;
+    }
+
+    /**
+     * @param string $verificationCode
+     */
+    public function setVerificationCode($verificationCode)
+    {
+        $this->verificationCode = $verificationCode;
+    }
+
+    /**
+     * @return string $verificationCode
+     */
+    public function getVerificationCode()
+    {
+        return $this->verificationCode;
+    }
+
+    /**
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @return int $id
+     */
+    public function getId()
+    {
+        return $this->id;
     }
 
     /**
@@ -172,5 +235,4 @@ class User
         return $this->username;
     }
 
-
-} 
+}

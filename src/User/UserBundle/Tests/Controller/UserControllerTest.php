@@ -8,15 +8,26 @@
 
 namespace User\UserBundle\Tests\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class UserControllerTest {
+class UserControllerTest extends WebTestCase
+{
 
-    public function testIndex()
+    public function testRegisterUserAction()
     {
         $client = static::createClient();
-
-        $crawler = $client->request('GET', '/hello/Fabien');
-
-        $this->assertTrue($crawler->filter('html:contains("Hello Fabien")')->count() > 0);
+        $crawler = $client->request(
+            'POST',
+            '/register/user',
+            array(
+                "firstName"         => "Alex",
+                "lastName"          => "Sapountzis",
+                "username"          => "asap@gmail.com",
+                "passcode"          => "12345hello",
+            ),
+            array(),
+            array()
+        );
+        $this->assertEquals('RedirectResponse', $this->getMockBuilder('RedirectResponse'), 'Redirect Reponse Object returned.');
     }
 } 

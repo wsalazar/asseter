@@ -26,7 +26,8 @@ class UserFactory
             isset($user['firstName']) ? trim($user['firstName']) : null,
             isset($user['lastName']) ? trim($user['lastName']) : null,
             isset($user['email']) ? trim($user['email']) : null,
-            isset($user['encoded_passcode']) ? $user['encoded_passcode'] : null
+            isset($user['encoded_passcode']) ? $user['encoded_passcode'] : null,
+            $user['verification_code'] = uniqid('')
         );
     }
 }

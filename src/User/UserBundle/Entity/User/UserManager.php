@@ -47,7 +47,7 @@ class UserManager
      * @throws \Symfony\Component\Form\Exception\AlreadySubmittedException
      * @internal param \User\UserBundle\Entity\User\UserFactory $createUser
      * @internal param \User\UserBundle\Service\DatabaseManager $db
-     * @return bool
+     * @return User                            $createdUser
      */
     public function createUser($user, Encoder $encoder)
     {
@@ -62,7 +62,7 @@ class UserManager
         $em->persist($createdUser);
         $em->flush();
 
-        return true;
+        return $createdUser;
     }
 
     /**
@@ -109,8 +109,52 @@ class UserManager
      */
     public function verifyPasscode(Encoder $encoder, $queriedUser, $submittedUser )
     {
-
         return $encoder->isPasswordValid((string) $queriedUser[0]['encodedPasscode'], (string) trim($submittedUser['passcode']));
     }
 
+    /**
+     * @param $verificationCode
+     * @return mixed
+     */
+    public function activateUser($user = array())
+    {
+        $em = $this->_db->getEntityManager();
+        $query = $em->createQueryBuilder()
+            ->update('UserUserBundle:User','u')
+            ->set('u.active', 1)
+            ->where('u.verificationCode = :verification_code')
+            ->setParameter('verification_code', $user['verificationCode'])
+            ->getQuery();
+        return $query->execute();
+    }
+
+    /**
+     * @param array $user
+     * @return bool
+     */
+    public function isActive($user = array())
+    {
+        $em = $this->_db->getEntityManager();
+        $query = $em->createQueryBuilder()
+            ->select('u.active')
+            ->from('UserUserBundle:User', 'u')
+            ->where('u.username = :user_name')
+            ->setParameter('user_name', $user['email'])
+            ->getQuery();
+
+        return $query->execute()[0]['active'] == 1 ? True : False ;
+    }
+
+    public function getVerificationCodeByUserName($user = array())
+    {
+        $em = $this->_db->getEntityManager();
+        $query = $em->createQueryBuilder()
+            ->select('u.verificationCode')
+            ->from('UserUserBundle:User', 'u')
+            ->where('u.username = :user_name')
+            ->setParameter('user_name', $user['email'])
+            ->getQuery();
+
+        return $query->execute()[0]['verificationCode'];
+    }
 }
