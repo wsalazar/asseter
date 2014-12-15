@@ -1,15 +1,19 @@
 user_user_homepage:
-    path:     /
+    path:  /
     defaults: { _controller: UserUserBundle:User:login }
 
+user_submit:
+    path:  /user/submit
+    defaults: { _controller: UserUserBundle:User:userSubmit }
+
 user_dashboard:
-    path: /dashboard
+    path:  /dashboard
     defaults: { _controller: AsseterDashboardBundle:Asseter:index }
 
 user_register:
-    path:     /register
+    path:  /register
     defaults: { _controller: UserUserBundle:User:register }
 
 user_register_submit:
-    path:    /register/user
+    path:  /register/user
     defaults: { _controller: UserUserBundle:User:registerUser }

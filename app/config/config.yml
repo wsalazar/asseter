@@ -74,13 +74,14 @@ services:
         arguments: [user]
 
     user_manager:
-            class: User\UserBundle\Entity\User\UserManager
-#            arguments: [user]
+        class: User\UserBundle\Entity\User\UserManager
+        arguments: ["@database_manager", "@user_factory"]
 
-    sha256salted_encoder:
-        class: User\UserBundle\Service\Sha256Salted
+    password_encoder:
+        class: User\UserBundle\Service\Encoder
+        arguments: [%cost%]
 
     database_manager:
         class: User\UserBundle\Service\DatabaseManager
         arguments:
-                entityManager: "@doctrine.orm.entity_manager"
+           entityManager: "@doctrine.orm.entity_manager"

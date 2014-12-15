@@ -1,7 +1,15 @@
 parameters:
+#     entityManager: Doctrine\ORM\EntityManager
 #    user_user.example.class: User\UserBundle\Example
 
 services:
 #    user_user.example:
 #        class: %user_user.example.class%
 #        arguments: [@service_id, "plain_value", %parameter%]
+
+#     db:
+#         class: User\UserBundle\Service\DatabaseManager
+#         arguments: ["%entityManager%"]
+
+#     userFactory:
+#         class: User\UserBundle\Entity\User

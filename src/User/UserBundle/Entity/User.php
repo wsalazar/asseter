@@ -51,7 +51,7 @@ class User {
      * @Assert\NotBlank()
      * @var $passcode string
      */
-    protected $passcode;
+    protected $encodedPasscode;
 
     /**
      * @var
@@ -87,7 +87,7 @@ class User {
         if ( strlen($passcode) < 5 ) {
             throw new \InvalidArgumentException('Password must be longer than 5 characters');
         }
-        $this->setPasscode($passcode);
+        $this->setEncodedPasscode($passcode);
     }
 
     /**
@@ -141,17 +141,17 @@ class User {
     /**
      * @param string $passcode
      */
-    public function setPasscode($passcode)
+    public function setEncodedPasscode($passcode)
     {
-        $this->passcode = $passcode;
+        $this->encodedPasscode = $passcode;
     }
 
     /**
      * @return string
      */
-    public function getPasscode()
+    public function getEncodedPasscode()
     {
-        return $this->passcode;
+        return $this->encodedPasscode;
     }
 
     /**

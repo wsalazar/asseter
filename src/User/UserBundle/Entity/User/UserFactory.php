@@ -9,22 +9,20 @@
 namespace User\UserBundle\Entity\User;
 
 use User\UserBundle\Entity\User;
-use User\UserBundle\Service\Sha256Salted as Encoder;
 
 class UserFactory
 {
     /**
      * @param array $user
-     * @param Encoder $encoder
      * @return User
      */
-    public function create($user = array(), Encoder $encoder)
+    public function create($user = array())
     {
         return new User(
             isset($user['firstName']) ? trim($user['firstName']) : null,
             isset($user['lastName']) ? trim($user['lastName']) : null,
             isset($user['email']) ? trim($user['email']) : null,
-            isset($user['passcode']) ? $encoder->encodePassword(trim($user['passcode']), uniqid(mt_rand())) : null
+            isset($user['encoded_passcode']) ? $user['encoded_passcode'] : null
         );
     }
 }
