@@ -8,7 +8,7 @@
 
 namespace User\UserBundle\Service;
 
-Use User\UserBundle\Entity\User;
+use User\UserBundle\Entity\User;
 
 /**
  * Class EmailRegisterService
@@ -17,17 +17,26 @@ Use User\UserBundle\Entity\User;
 class EmailRegisterService
 {
 
+    /**
+     * @param array $parts
+     * @return array
+     */
     public function prepareFields($parts = array())
     {
-//        User $user, $username
         $from = $parts['mailer'];
         $to = $parts['user']->getUsername();
         $subject = $parts['user']->getFirstName() . ', you have registered an account with Asseter.';
         $verificationCode = $parts['user']->getVerificationCode();
         $body = ['first_name'=>$parts['user']->getFirstName(), 'verification_code'=>$verificationCode, 'host'=>$parts['host']];
-        return ['from'=>$from,'to'=>$to,'subject'=>$subject,'verification_code'=>$verificationCode,'body'=>$body];
+
+        return ['from'=>$from,'to'=>$to,'subject'=>$subject,'body'=>$body];
     }
 
+    /**
+     * @param array $parts
+     * @param array $body
+     * @return \Swift_Mime_SimpleMimeEntity
+     */
     public function setFields($parts, $body)
     {
         $message = \Swift_Message::newInstance()
@@ -39,4 +48,4 @@ class EmailRegisterService
 
         return $message;
     }
-} 
+}

@@ -1,7 +1,7 @@
 {% extends 'UserUserBundle::layout.html.twig' %}
 
 {% block body %}
-<form action="/register/verification-code/{{ verification_code }}" method="post" {{ form_enctype(user) }} >
+<form action="/register/verification-code/{{ verification_code }}" method="post" {{ form_enctype(verification) }} >
     <ul>
         {% for flashMessage in app.session.flashbag.get('notice') %}
             <li>{{ flashMessage }}</li>
@@ -11,9 +11,9 @@
         <label for="verificationCode">Verification Code: </label><input id="verificationCode" name="verificationCode" type="text"  />
     </div>
     <div>
-        <input type="hidden" name="verificationCode" value="{{ verification_code }}" />
-        <input type="hidden" name="username" value="{{ person }}" />
-        <input type="hidden" name="_token" value="{{ csrf_token('user') }}" />
+        {#<input type="hidden" name="verificationCode" value="{{ verification_code }}" />#}
+        <input type="hidden" name="email" value="{{ username }}" />
+        <input type="hidden" name="_token" value="{{ csrf_token('verification') }}" />
         <input type="submit" name="login" value="Login" />
     </div>
     {#background: none repeat scroll 0 0 #448df6;#}

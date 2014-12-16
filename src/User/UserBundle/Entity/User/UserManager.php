@@ -14,6 +14,8 @@ use Symfony\Component\Form\Exception\AlreadySubmittedException;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder as PasswordEncoder;
 use User\UserBundle\Service\Encoder;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Query\Parameter;
 
 /**
  * Class UserManager
@@ -55,7 +57,7 @@ class UserManager
         $user['encoded_passcode'] = $encoder->encode($passcode, null);
         unset($user['passcode']);
         $createdUser = $this->_userFactory->create($user);
-        if ( $this->isUserExists($createdUser) ) {
+        if ($this->isUserExists($createdUser)) {
             throw new AlreadySubmittedException(sprintf('User: %s already exists.', $createdUser->getUsername()));
         }
         $em = $this->_db->getEntityManager();
@@ -107,24 +109,41 @@ class UserManager
      * @param array   $submittedUser
      * @return bool
      */
-    public function verifyPasscode(Encoder $encoder, $queriedUser, $submittedUser )
+    public function verifyPasscode(Encoder $encoder, $queriedUser, $submittedUser)
     {
         return $encoder->isPasswordValid((string) $queriedUser[0]['encodedPasscode'], (string) trim($submittedUser['passcode']));
     }
 
     /**
-     * @param $verificationCode
+     * @param array $user
+     * @internal param $verificationCode
      * @return mixed
      */
     public function activateUser($user = array())
     {
         $em = $this->_db->getEntityManager();
-        $query = $em->createQueryBuilder()
-            ->update('UserUserBundle:User','u')
-            ->set('u.active', 1)
-            ->where('u.verificationCode = :verification_code')
-            ->setParameter('verification_code', $user['verificationCode'])
-            ->getQuery();
+        $activate = $em->createQueryBuilder();
+        $activate->update('UserUserBundle:User', 'u');
+        $activate->set('u.active', 1);
+        $verificationCode = trim($user['verificationCode']);
+        $email = isset($user['email']) ? $user['email'] : null ;
+        if (isset($email) && isset($verificationCode)) {
+            $activate->where('u.username = :user_name ');
+            $activate->andWhere('u.verificationCode = :verification_code ');
+            $activate->setParameters(
+                new ArrayCollection(
+                    array(
+                                                        new Parameter('user_name', $email),
+                                                        new Parameter('verification_code', $verificationCode)
+                    )
+                )
+            );
+        } elseif (is_null($email) && isset($verificationCode)) {
+            $activate->where('u.verificationCode = :verification_code');
+            $activate->setParameter('verification_code', $verificationCode);
+        }
+        $query = $activate->getQuery();
+
         return $query->execute();
     }
 
@@ -142,9 +161,13 @@ class UserManager
             ->setParameter('user_name', $user['email'])
             ->getQuery();
 
-        return $query->execute()[0]['active'] == 1 ? True : False ;
+        return $query->execute()[0]['active'] == 1 ? true : false ;
     }
 
+    /**
+     * @param array $user
+     * @return mixed
+     */
     public function getVerificationCodeByUserName($user = array())
     {
         $em = $this->_db->getEntityManager();

@@ -36,21 +36,28 @@ class UserController extends Controller
      */
     public function registerVerificationAction(Request $request)
     {
-        $verificationCode = $request->get('verification_code');
-        if (isset($verificationCode)) {
-            var_dump($this->get('user_manager')->activateUser(['verificationCode'=>$verificationCode]));
-            die();
-//            return 'yes';
-//            return $this->redirect($this->generateUrl('user_dashboard'));
+        $emailVerify = ['verificationCode'=>$request->get('verificationCode')];
+        $loginVerify = $request->request->all();
+        $form = $this->createForm(new UserType());
+        if (count($loginVerify)) {
+            if ($this->get('user_manager')->activateUser($loginVerify)) {
+                return $this->redirect($this->generateUrl('user_dashboard'));
+            } else {
+                $this->get('session')->getFlashBag()->add('notice', 'Nope! Verification is not right. Are you using someone else\'s?.');
+                $verificationCode = $this->get('user_manager')->getVerificationCodeByUserName($loginVerify);
+
+                return $this->render('UserUserBundle:User:verification.html.twig',
+                    [
+                        'username'=>$loginVerify['email'],
+                        'verification_code'=>$verificationCode,
+                        'verification'=> $form->createView()
+                    ]);
+            }
+        } else {
+            $this->get('user_manager')->activateUser($emailVerify);
+
+            return $this->redirect($this->generateUrl('user_dashboard'));
         }
-//        $verifyUser = $this->createForm(new UserType());
-//        $verifyUser->submit($request->request->all());
-//        if ( $verifyUser->isValid() ) {
-//            if ($this->get('user_manager')->activateUser($verifyUser->getData()) ) {
-//
-//                return $this->redirect($this->generateUrl('user_dashboard'));
-//            }
-//        }
     }
 
     /**
@@ -76,13 +83,23 @@ class UserController extends Controller
                 }
             } else {
                 $verificationCode = $this->get('user_manager')->getVerificationCodeByUserName($form->getData());
-                return $this->render('UserUserBundle:User:verification.html.twig', ['person'=>$form->getData()['email'],'user'=> $form->createView(),'verification_code'=>$verificationCode]);
+
+                return $this->render('UserUserBundle:User:verification.html.twig',
+                    [
+                        'username'=>$form->getData()['email'],
+                        'verification_code'=>$verificationCode,
+                        'verification'=> $form->createView()
+                    ]);
             }
         }
         if ( $this->getErrorMessages($form) ) {
             foreach ($this->getErrorMessages($form) as $errors) {
-                foreach ($errors as $error) {
-                    $this->get('session')->getFlashBag()->add('notice', $error);
+                if (!is_array($errors) || !is_object($errors)) {
+                    $this->get('session')->getFlashBag()->add('notice', $errors);
+                } else {
+                    foreach ($errors as $error) {
+                        $this->get('session')->getFlashBag()->add('notice', $error);
+                    }
                 }
             }
         }
@@ -117,8 +134,7 @@ class UserController extends Controller
                 $this->get('session')->getFlashBag()->add('notice', 'You have an asseter account!');
                 $parts = ['user'=>$createdUser,'mailer'=>$this->container->getParameter('mailer_user'), 'host'=>$request->headers->get('host')];
                 $emailParts = $this->get('user_register_email')->prepareFields($parts);
-                $body = $this->renderView(
-                    'UserUserBundle:User:email.html.twig',$emailParts['body']);
+                $body = $this->renderView('UserUserBundle:User:email.html.twig', $emailParts['body']);
                 $message = $this->get('user_register_email')->setFields($emailParts, $body);
                 $this->get('mailer')->send($message);
 

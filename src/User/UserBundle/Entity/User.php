@@ -76,6 +76,7 @@ class User
      * @param string $lastName
      * @param string $username
      * @param string $passcode
+     * @param string $verificationCode
      * @throws \InvalidArgumentException
      */
     public function __construct($firstName, $lastName, $username, $passcode, $verificationCode)
