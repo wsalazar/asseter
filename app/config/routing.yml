@@ -1,5 +1,11 @@
-user_user:
-    resource: "@UserUserBundle/Resources/config/routing.yml"
+asseter_assets:
+    resource: "@AsseterAssetsBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
+asseter_user:
+    resource: "@AsseterUserBundle/Controller/"
+    type:     annotation
     prefix:   /
 
 app:

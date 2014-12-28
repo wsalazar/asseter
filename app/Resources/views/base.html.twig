@@ -1,37 +1,13 @@
-{#<!DOCTYPE html>#}
-{#<html>#}
-    {#<head>#}
-        {#<meta charset="UTF-8" />#}
-        {#<title>{% block title %}Asseter{% endblock %}</title>#}
-        {#{% block stylesheets %}{% endblock %}#}
-        {#<link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />#}
-    {#</head>#}
-    {#<body>#}
-        {#{% block body %}{% endblock %}#}
-        {#{% block javascripts %}{% endblock %}#}
-    {#</body>#}
-{#</html>#}
 <!DOCTYPE html>
 <html>
-<head>
-    <meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
-    <title>{% block title %}Asseter{% endblock %}</title>
-    {#{% block stylesheets %}#}
-    {#{% block stylesheets %}#}
-        <link href="web/assets/css/bootstrap.css" rel="stylesheet" />
-        <link href="web/assets/css/bootstrap-theme.css" rel="stylesheet" />
-        <link href="web/assets/css/font-awesome.css" rel="stylesheet" />
-    {#{% endblock %}#}
-        {#{% stylesheets '/web/assets/css/*' filter='cssrewrite'  %}#}
-        {#<link href="{{ asset('/bower_components/font-awesome/css/font-awesome.css') }}" type="text/css" rel="stylesheet" />#}
-        {#<link href="{{ asset('bower_components/bootstrap/dist/css/bootstrap.css') }}" type="text/css" rel="stylesheet" />#}
-            {#<link href="{{ asset_url }}" rel="stylesheet" />#}
-        {#{% endstylesheets %}#}
-    {#{% endblock %}#}
-</head>
-<header>Asseter</header>
-<body>
-{% block body %}{% endblock %}
-{% block javascripts %}{% endblock %}
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        {% block stylesheets %}{% endblock %}
+        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+    </head>
+    <body>
+        {% block body %}{% endblock %}
+        {% block javascripts %}{% endblock %}
+    </body>
 </html>

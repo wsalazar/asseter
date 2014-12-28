@@ -8,7 +8,12 @@ conventions and annotations. It allows for more concise controllers.
 Installation
 ------------
 
-`Download`_ the bundle and put it under the ``Sensio\Bundle\`` namespace.
+Before using this bundle in your project, add it to your ``composer.json`` file:
+
+.. code-block:: bash
+
+    $ composer require sensio/framework-extra-bundle
+
 Then, like for any other bundle, include it in your Kernel class::
 
     public function registerBundles()
@@ -22,11 +27,22 @@ Then, like for any other bundle, include it in your Kernel class::
         ...
     }
 
+.. _release-cycle-note:
+
+.. note::
+
+    Since SensioFrameworkExtraBundle 3.0 its release cycle is out of sync
+    with Symfony's release cycle. This means that you can simply require
+    ``sensio/framework-extra-bundle: ~3.0`` in your ``composer.json`` file
+    and Composer will automatically pick the latest bundle version for you.
+    You have to use Symfony 2.4 or later for this workflow. Before Symfony
+    2.4, the required version of the SensioFrameworkExtraBundle should be
+    the same as your Symfony version.
+
 If you plan to use or create annotations for controllers, make sure to update
 your ``autoload.php`` by adding the following line::
 
     Doctrine\Common\Annotations\AnnotationRegistry::registerLoader(array($loader, 'loadClass'));
-
 
 Configuration
 -------------
@@ -41,29 +57,32 @@ The default configuration is as follow:
     .. code-block:: yaml
 
         sensio_framework_extra:
-            router:  { annotations: true }
-            request: { converters: true }
-            view:    { annotations: true }
-            cache:   { annotations: true }
+            router:   { annotations: true }
+            request:  { converters: true, auto_convert: true }
+            view:     { annotations: true }
+            cache:    { annotations: true }
+            security: { annotations: true }
 
     .. code-block:: xml
 
         <!-- xmlns:sensio-framework-extra="http://symfony.com/schema/dic/symfony_extra" -->
         <sensio-framework-extra:config>
             <router annotations="true" />
-            <request converters="true" />
+            <request converters="true" auto_convert="true" />
             <view annotations="true" />
             <cache annotations="true" />
+            <security annotations="true" />
         </sensio-framework-extra:config>
 
     .. code-block:: php
 
         // load the profiler
         $container->loadFromExtension('sensio_framework_extra', array(
-            'router'  => array('annotations' => true),
-            'request' => array('converters' => true),
-            'view'    => array('annotations' => true),
-            'cache'   => array('annotations' => true),
+            'router'   => array('annotations' => true),
+            'request'  => array('converters' => true, 'auto_convert' => true),
+            'view'     => array('annotations' => true),
+            'cache'    => array('annotations' => true),
+            'security' => array('annotations' => true),
         ));
 
 You can disable some annotations and conventions by defining one or more
@@ -98,6 +117,7 @@ The following annotations are defined by the bundle:
    annotations/converters
    annotations/view
    annotations/cache
+   annotations/security
 
 This example shows all the available annotations in action::
 
@@ -106,6 +126,7 @@ This example shows all the available annotations in action::
     use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
     use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
     use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+    use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
     /**
      * @Route("/blog")
@@ -128,8 +149,9 @@ This example shows all the available annotations in action::
          * @Route("/{id}")
          * @Method("GET")
          * @ParamConverter("post", class="SensioBlogBundle:Post")
-         * @Template("SensioBlogBundle:Annot:post.html.twig", vars={"post"})
-         * @Cache(smaxage="15")
+         * @Template("SensioBlogBundle:Annot:show.html.twig", vars={"post"})
+         * @Cache(smaxage="15", lastmodified="post.getUpdatedAt()", etag="'Post' ~ post.getId() ~ post.getUpdatedAt()")
+         * @Security("has_role('ROLE_ADMIN') and is_granted('POST_SHOW', post)")
          */
         public function showAction(Post $post)
         {
@@ -141,15 +163,25 @@ annotations::
 
     /**
      * @Route("/{id}")
-     * @Cache(smaxage="15")
+     * @Cache(smaxage="15", lastModified="post.getUpdatedAt()", ETag="'Post' ~ post.getId() ~ post.getUpdatedAt()")
+     * @Security("has_role('ROLE_ADMIN') and is_granted('POST_SHOW', post)")
      */
     public function showAction(Post $post)
     {
     }
 
-The routes need to be imported to be active as any other routing resources,
-see :ref:`Annotated Routes Activation<frameworkextra-annotations-routing-activation>` for
-details.
+The routes need to be imported to be active as any other routing resources, for
+example:
 
-.. _`SensioFrameworkExtraBundle`: https://github.com/sensio/SensioFrameworkExtraBundle
-.. _`Download`: http://github.com/sensio/SensioFrameworkExtraBundle
+.. code-block:: yaml
+
+    # app/config/routing.yml
+
+    # import routes from a controller directory
+    annot:
+        resource: "@AnnotRoutingBundle/Controller"
+        type:     annotation
+
+see :ref:`Annotated Routes Activation<frameworkextra-annotations-routing-activation>` for more details.
+
+.. _`SensioFrameworkExtraBundle`: https://github.com/sensiolabs/SensioFrameworkExtraBundle
