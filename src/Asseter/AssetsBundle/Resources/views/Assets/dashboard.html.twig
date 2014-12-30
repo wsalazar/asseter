@@ -1,6 +1,7 @@
 {% extends 'AsseterUserBundle::layout.html.twig' %}
 
 {% block body %}
+    Welcome {{ user['name'] }}!
     <a href="{{ path('logout') }}">Logout</a>
     <form action="{{ path('user_submit') }}" method="post" {{ form_enctype(assets) }} >
         <ul>

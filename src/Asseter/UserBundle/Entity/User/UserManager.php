@@ -86,7 +86,7 @@ class UserManager
     {
         $em = $this->_db->getEntityManager();
         $query = $em->createQueryBuilder()
-            ->select('u.encodedPasscode, u.email, u.role')
+            ->select('u.encodedPasscode, u.email, u.role, u.firstName, u.lastName')
             ->from('AsseterUserBundle:User', 'u')
             ->where('u.email = :email')
             ->setParameter('email', $user['email'])
@@ -102,7 +102,7 @@ class UserManager
     {
         $em = $this->_db->getEntityManager();
         $query = $em->createQueryBuilder()
-            ->select('u.role')
+            ->select('u.role, u.firstName, u.lastName, u.email')
             ->from('AsseterUserBundle:User', 'u')
             ->where('u.email = :email')
             ->setParameter('email', $user['email'])
@@ -114,11 +114,11 @@ class UserManager
      * @param array $user
      * @return mixed|null
      */
-    public function fetchEmailRoleByVerificationCode($user)
+    public function fetchUserByVerificationCode($user)
     {
         $em = $this->_db->getEntityManager();
         $query = $em->createQueryBuilder()
-            ->select('u.role, u.email')
+            ->select('u.role, u.firstName, u.lastName, u.email')
             ->from('AsseterUserBundle:User', 'u')
             ->where('u.verificationCode = :verificationCode')
             ->setParameter('verificationCode', $user['verificationCode'])

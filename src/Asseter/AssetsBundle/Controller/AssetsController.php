@@ -12,7 +12,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Asseter\AssetsBundle\Form\AssetsType;
+use Symfony\Component\HttpFoundation\Session;
 use Symfony\Component\HttpFoundation\Request;
+
 
 /**
  * Class AssetsController
@@ -26,32 +28,25 @@ class AssetsController extends Controller
      */
     public function dashboardAction(Request $request)
     {
-        $user = $request->request;
-        echo '<pre>';
-        var_dump($user);
-        die();
-
-        $user = $this->get('security.token_storage')->getToken()->getUser();
-        if($this->get('security.token_storage')->isGranted('ROLE_USER')) {
-            $assetsForm = $this->createForm(new AssetsType);
-            $assetsForm->handleRequest($request);
-            return $this->render(
-                'AsseterAssetsBundle:Assets:dashboard.html.twig',
-                ['assets'=>$assetsForm->createView()]
-            );
-        }
+        $user = $this->get('session')->get('user-session');
+        $assetsForm = $this->createForm(new AssetsType);
+        $assetsForm->handleRequest($request);
+        return $this->render(
+            'AsseterAssetsBundle:Assets:dashboard.html.twig',
+            [
+                'assets'    =>  $assetsForm->createView(),
+                'user'      =>  $user
+            ]
+        );
     }
 
     /**
      * @Route("/logout", name="logout")
      */
-    public function logoutAction()
+    public function logoutAction(Request $request)
     {
         $this->get('security.context')->setToken(null);
         $this->get('request')->getSession()->invalidate();
-
-        return $this->render(
-            'AsseterUserBundle:Assets:index.html.twig'
-        );
+        return $this->redirect($this->generateUrl('user_user_homepage'));
     }
 } 

@@ -7,7 +7,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Asseter\UserBundle\Form\UserType;
-
+use Symfony\Component\HttpFoundation\Session;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -39,8 +39,10 @@ class UserController extends Controller
                 $user = $this->get('user_manager')->fetchUserByEmail($loginVerify);
                 $token = new UsernamePasswordToken($loginVerify['email'], null, "main", [$user[0]['role']]);
                 $this->get('security.token_storage')->setToken($token);
+                $session = $this->get('session');
+                $session->set('user-session', $user);
 
-                return $this->redirect($this->generateUrl('user_dashboard',$loginVerify));
+                return $this->redirect($this->generateUrl('user_dashboard'));
             } else {
                 $this->get('session')->getFlashBag()->add('notice', 'Nope! Verification is not right. Are you using someone else\'s?.');
                 $verificationCode = $this->get('user_manager')->getVerificationCodeByEmail($loginVerify);
@@ -53,11 +55,13 @@ class UserController extends Controller
             }
         } else {
             if($this->get('user_manager')->activateUser($emailVerify)) {
-                $user = $this->get('user_manager')->fetchEmailRoleByVerificationCode($emailVerify);
+                $user = $this->get('user_manager')->fetchUserByVerificationCode($emailVerify);
                 $token = new UsernamePasswordToken($user[0]['email'], null, "main", [$user[0]['role']]);
                 $this->get('security.token_storage')->setToken($token);
+                $session = $this->get('session');
+                $session->set('user-session', $user);
 
-                return $this->redirect($this->generateUrl('user_dashboard',$emailVerify));
+                return $this->redirect($this->generateUrl('user_dashboard'));
             } else {
                 $flashMessage = "Whoa!! Something went wrong. Please contact our nerds <a href='mailto:will.a.salazar@gmail.com'>Asseter Nerds</a>. Provide your Verification Code.";
                 $this->get('session')->getFlashBag()->add('notice', $flashMessage);
@@ -82,9 +86,16 @@ class UserController extends Controller
                     if ($this->get('user_manager')->verifyPasscode($encoder, $userCred, $userLogin->getData()) ) {
                         $token = new UsernamePasswordToken($userCred[0]['email'], null, "main", [$userCred[0]['role']]);
                         $this->get('security.token_storage')->setToken($token);
+                        $session = $this->get('session');
+                        $user = [
+                                'email' =>  $userCred[0]['email'],
+                                'role'  =>  $userCred[0]['role'],
+                                'name'  =>  $userCred[0]['firstName'] . ' ' . $userCred[0]['lastName']
+                        ];
+                        $session->set('user-session', $user);
 
 
-                        return $this->redirect($this->generateUrl('user_dashboard',$userCred[0]['email']));
+                        return $this->redirect($this->generateUrl('user_dashboard'));
                     } else {
                         $this->get('session')->getFlashBag()->add('notice', 'You just used a different passcode than what we have.');
                     }
