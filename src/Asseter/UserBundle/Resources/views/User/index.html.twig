@@ -1,0 +1,40 @@
+{% extends 'AsseterUserBundle::layout.html.twig' %}
+
+{% block body %}
+    <form action="{{ path('user_submit') }}" method="post" {{ form_enctype(user) }} >
+        <ul>
+            {% for flashMessage in app.session.flashbag.get('notice') %}
+                <li>{{ flashMessage }}</li>
+            {% endfor %}
+        </ul>
+        <div>
+            <label for="email" class="letter">E-mail: </label><input class="mark" id="email" name="email" type="email"  />
+            <label for="passcode">Passcode: </label><input id="passcode" name="passcode" type="password"  />
+            <input type="checkbox" id="remember_me" name="_remember_me"/>
+            <label for="remember_me">Keep me logged in</label>
+        </div>
+        {#<div>#}
+        {#{{ form_label(userLogin.email) }}#}
+        {#{{ form_errors(userLogin.email) }}#}
+        {#{{ form_widget(userLogin.email) }}#}
+        {#</div>#}
+        {#<div>#}
+        {#{{ form_label(userLogin.passcode) }}#}
+        {#{{ form_errors(userLogin.passcode) }}#}
+        {#{{ form_widget(userLogin.passcode) }}#}
+        {#</div>#}
+        <div>
+            <input type="hidden" name="_token" value="{{ csrf_token('user') }}" />
+            <input type="submit" name="login" value="Login" />
+            {#{{ form_widget(userLogin.login) }}#}
+            <a href="{{ path('user_register') }}" id="register">Register</a>
+        </div>
+        {#{{ form_rest(userLogin) }}#}
+
+        {#background: none repeat scroll 0 0 #448df6;#}
+        {#border: 3px solid #448df6;#}
+        {#color: #14c65e;#}
+        {#float: left;#}
+        {#margin-right: 10px;#}
+    </form>
+{% endblock %}

@@ -1,0 +1,13 @@
+asseter_assets:
+    resource: "@AsseterAssetsBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
+asseter_user:
+    resource: "@AsseterUserBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
+app:
+    resource: @AppBundle/Controller/
+    type:     annotation

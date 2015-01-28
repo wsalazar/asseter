@@ -1,0 +1,22 @@
+{% extends 'AsseterUserBundle::layout.html.twig' %}
+
+{% block body %}
+    Welcome {{ user['name'] }}!
+    <a href="{{ path('logout') }}">Logout</a>
+    <form action="{{ path('user_submit') }}" method="post" {{ form_enctype(assets) }} >
+        <ul>
+            {% for flashMessage in app.session.flashbag.get('notice') %}
+                <li>{{ flashMessage }}</li>
+            {% endfor %}
+        </ul>
+        <div>
+            <label for="attachment">Upload Asset: </label><input id="attachment" name="attachment" type="file"  />
+            <label for="file_label">File Name: </label><input id="file_label" name="file_label" type="text"  />
+        </div>
+        <div>
+            {#<input type="hidden" name="_token" value="{{ csrf_token('user') }}" />#}
+            <input type="submit" name="upload" value="Upload" />
+        </div>
+        {#{{ form_rest(userLogin) }}#}
+    </form>
+{% endblock %}

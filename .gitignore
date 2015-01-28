@@ -1,0 +1,8 @@
+vendor
+web/bundles
+.DS_Store
+app/cache
+app/config/parameters.yml
+app/config/parameters.yml.dist
+app/logs
+.metadata/
