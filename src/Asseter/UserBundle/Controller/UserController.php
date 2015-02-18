@@ -2,214 +2,280 @@
 
 namespace Asseter\UserBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Component\HttpFoundation\Request;
+use Asseter\UserBundle\Entity\User;
 use Asseter\UserBundle\Form\UserType;
-use Symfony\Component\HttpFoundation\Session;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
+/**
+ * User controller.
+ *
+ * @Route("/user")
+ */
 class UserController extends Controller
 {
 
     /**
-     * @Route("/register/verification-code/{verification_code}", name="user_register_verification")
-     * @param $verification_code
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * Lists all User entities.
+     *
+     * @Route("/", name="user")
+     * @Method("GET")
+     * @Template()
      */
-    public function registerVerificationCodeAction($verification_code, Request $request)
+    public function indexAction()
     {
-        $emailVerify = ['verificationCode'=>$verification_code];
-        $loginVerify = $request->request->all();
-        $form = $this->createForm(new UserType());
-        if (count($loginVerify)) {
-            if ($this->get('user_manager')->activateUser($loginVerify)) {
-                $user = $this->get('user_manager')->fetchUserByEmail($loginVerify);
-                $token = new UsernamePasswordToken($loginVerify['email'], null, "main", [$user[0]['role']]);
-                $this->get('security.token_storage')->setToken($token);
-                $user = [
-                    'email' =>  $user[0]['email'],
-                    'role'  =>  $user[0]['role'],
-                    'name'  =>  $user[0]['firstName'] . ' ' . $user[0]['lastName']
-                ];
-                $session = $this->get('session');
-                $session->set('user-session', $user);
+        $em = $this->getDoctrine()->getManager();
 
-                return $this->redirect($this->generateUrl('user_dashboard'));
-            } else {
-                $this->get('session')->getFlashBag()->add('notice', 'Nope! Verification is not right. Are you using someone else\'s?.');
-                $verificationCode = $this->get('user_manager')->getVerificationCodeByEmail($loginVerify);
-                return $this->render('AsseterUserBundle:User:verification.html.twig',
-                    [
-                        'email'             =>$loginVerify['email'],
-                        'verification_code' =>$verificationCode,
-                        'verification'      => $form->createView()
-                    ]);
-            }
-        } else {
-            if($this->get('user_manager')->activateUser($emailVerify)) {
-                $user = $this->get('user_manager')->fetchUserByVerificationCode($emailVerify);
-                $token = new UsernamePasswordToken($user[0]['email'], null, "main", [$user[0]['role']]);
-                $this->get('security.token_storage')->setToken($token);
-                $user = [
-                    'email' =>  $user[0]['email'],
-                    'role'  =>  $user[0]['role'],
-                    'name'  =>  $user[0]['firstName'] . ' ' . $user[0]['lastName']
-                ];
-                $session = $this->get('session');
-                $session->set('user-session', $user);
+        $entities = $em->getRepository('AsseterUserBundle:User')->findAll();
 
-                return $this->redirect($this->generateUrl('user_dashboard'));
-            } else {
-                $flashMessage = "Whoa!! Something went wrong. Please contact our nerds <a href='mailto:will.a.salazar@gmail.com'>Asseter Nerds</a>. Provide your Verification Code.";
-                $this->get('session')->getFlashBag()->add('notice', $flashMessage);
-
-                return $this->redirect($this->generateUrl('user_user_homepage'));
-            }
-        }
-    }
-
-    /**
-     * @Route("/login/submit", name="user_submit")
-     */
-    public function userSubmitLoginAction(Request $request)
-    {
-        $userLogin = $this->createForm(new UserType);
-        $userLogin->handleRequest($request);
-        $userLogin->submit($request->request->all());
-        if ( $userLogin->isValid() ) {
-            $encoder = $this->get('password_encoder');
-            if ($this->get('user_manager')->isActive($userLogin->getData())) {
-                if ($userCred = $this->get('user_manager')->fetchUser($userLogin->getData()) ) {
-                    if ($this->get('user_manager')->verifyPasscode($encoder, $userCred, $userLogin->getData()) ) {
-                        $token = new UsernamePasswordToken($userCred[0]['email'], null, "main", [$userCred[0]['role']]);
-                        $this->get('security.token_storage')->setToken($token);
-                        $session = $this->get('session');
-                        $user = [
-                                'email' =>  $userCred[0]['email'],
-                                'role'  =>  $userCred[0]['role'],
-                                'name'  =>  $userCred[0]['firstName'] . ' ' . $userCred[0]['lastName']
-                        ];
-                        $session->set('user-session', $user);
-
-
-                        return $this->redirect($this->generateUrl('user_dashboard'));
-                    } else {
-                        $this->get('session')->getFlashBag()->add('notice', 'You just used a different passcode than what we have.');
-                    }
-                } else {
-                    $this->get('session')->getFlashBag()->add('notice', 'Whoa! That E-mail isn\'t right.');
-                }
-            } else {
-                $verificationCode = $this->get('user_manager')->getVerificationCodeByEmail($userLogin->getData());
-
-                return $this->render('AsseterUserBundle:User:verification.html.twig',
-                    [
-                        'email'=>$userLogin->getData()['email'],
-                        'verification_code'=>$verificationCode,
-                        'verification'=> $userLogin->createView()
-                    ]);
-            }
-        }
-        if ( $this->getErrorMessages($userLogin) ) {
-            foreach ($this->getErrorMessages($userLogin) as $errors) {
-                if (!is_array($errors) || !is_object($errors)) {
-                    $this->get('session')->getFlashBag()->add('notice', $errors);
-                } else {
-                    foreach ($errors as $error) {
-                        $this->get('session')->getFlashBag()->add('notice', $error);
-                    }
-                }
-            }
-        }
-        return $this->redirect($this->generateUrl('user_user_homepage'));
-    }
-
-    /**
-     * @Route("/register", name="user_register")
-     * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function registerAction(Request $request)
-    {
-        $registerUser = $this->createForm(new UserType);
-        $registerUser->handleRequest($request);
-
-        return $this->render('AsseterUserBundle:User:register.html.twig', ['user'=> $registerUser->createView()]);
-    }
-
-    /**
-     * @Route("/register/user", name="user_register_submit")
-     * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     */
-    public function registerUserAction(Request $request)
-    {
-        $form = $this->createForm(new UserType());
-        $form->submit($request->request->all());
-        if ( $form->isValid() ) {
-            $encoder = $this->get('password_encoder');
-            $userManager = $this->get('user_manager');
-            if ($createdUser = $userManager->createUser($form->getData(), $encoder) ) {
-                $parts = ['user'=>$createdUser,'mailer'=>$this->container->getParameter('mailer_user'), 'host'=>$request->headers->get('host')];
-                $emailParts = $this->get('user_register_email')->prepareFields($parts);
-                $body = $this->renderView('AsseterUserBundle:User:email.html.twig', $emailParts['body']);
-                $message = $this->get('user_register_email')->setFields($emailParts, $body);
-                $this->get('mailer')->send($message);
-                $flashMessage = "Congratulations " . $form->getData()['firstName'] . ", you have an Asseter account!\n Check your email to activate.";
-                $this->get('session')->getFlashBag()->add('notice', $flashMessage);
-
-                return $this->redirect($this->generateUrl('user_register'));
-            }
-        }
-        if ( $this->getErrorMessages($form) ) {
-            foreach ($this->getErrorMessages($form) as $errors) {
-                if (!is_array($errors) || !is_object($errors)) {
-                    $this->get('session')->getFlashBag()->add('notice', $errors);
-                } else {
-                    foreach ($errors as $error) {
-                        $this->get('session')->getFlashBag()->add('notice', $error);
-                    }
-                }
-            }
-        }
-        return $this->redirect($this->generateUrl('user_register'));
-    }
-    /**
-     * @Route("/login", name="user_user_homepage")
-     * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function loginAction(Request $request)
-    {
-        $loginForm = $this->createForm(new UserType);
-        $loginForm->handleRequest($request);
-        return $this->render(
-            'AsseterUserBundle:User:index.html.twig',
-            ['user'=> $loginForm->createView()]
+        return array(
+            'entities' => $entities,
         );
     }
 
     /**
-     * @param \Symfony\Component\Form\Form $form
+     * @Route("/register", name="user_register")
+     * @Template("AsseterUserBundle:User:register.html.twig")
+     * @param Request $request
      * @return array
      */
-    private function getErrorMessages(\Symfony\Component\Form\Form $form)
+    public function registerAction(Request $request)
     {
-        $errors = array();
-        foreach ($form->getErrors() as $key => $error) {
-            $errors[] = $error->getMessage();
-        }
-        foreach ($form->all() as $child) {
-            if (!$child->isValid()) {
-                $errors[$child->getName()] = $this->getErrorMessages($child);
-            }
-        }
-        return $errors;
+        $entity = new User();
+        $registerUser = $this->_createCreateForm($entity, true);
+        return array(
+            'register'=>$registerUser->createView(),
+        );
     }
 
+    /**
+     * @Route("/login", name="user_login")
+     * @Template("AsseterUserBundle:User:login.html.twig")
+     * @param Request $request
+     * @return array
+     */
+    public function loginAction(Request $request)
+    {
+        $entity = new User();
+        $loginUser = $this->_createCreateForm($entity, false);
+        return array(
+            'login'=>$loginUser->createView(),
+        );
+    }
+
+    /**
+     * Creates a form to create a User entity.
+     *
+     * @param User $entity The entity
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function _createCreateForm(User $entity, $isRegister = false)
+    {
+        $form = $this->createForm(new UserType($isRegister), $entity, array(
+            'action' => $this->generateUrl('user_create'),//Might have to change this to user_login for creating a user entity or something
+            'method' => 'POST',
+        ));
+
+        return $form;
+    }
+
+    /**
+     * Creates a new User entity.
+     *
+     * @Route("/", name="user_create")
+     * @Method("POST")
+     * @Template("AsseterUserBundle:User:register.html.twig")
+     */
+    public function createAction(Request $request)
+    {
+        $vars = $request->get('user');
+        $entity = new User();
+        $register = $this->_createCreateForm($entity, true);
+        $register->handleRequest($request);
+        if ($register->isValid()) {
+//            $encoder = $this->get('password_encoder');
+//            $userManager = $this->get('user_manager');
+//            $this->get('user_manager');
+        var_dump($vars); exit;
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($entity);
+            $em->flush();
+
+            return $this->redirect($this->generateUrl('user_show', array('id' => $entity->getId())));
+        }
+
+        return array(
+//            'entity' => $entity,
+            'register'   => $register->createView(),
+        );
+    }
+
+
+    /**
+     * Displays a form to create a new User entity.
+     *
+     * @Route("/new", name="user_new")
+     * @Method("GET")
+     * @Template()
+     */
+    public function newAction()
+    {
+        $entity = new User();
+        $form   = $this->createCreateForm($entity);
+
+        return array(
+            'entity' => $entity,
+            'form'   => $form->createView(),
+        );
+    }
+
+    /**
+     * Finds and displays a User entity.
+     *
+     * @Route("/{id}", name="user_show")
+     * @Method("GET")
+     * @Template()
+     */
+    public function showAction($id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $entity = $em->getRepository('AsseterUserBundle:User')->find($id);
+
+        if (!$entity) {
+            throw $this->createNotFoundException('Unable to find User entity.');
+        }
+
+        $deleteForm = $this->createDeleteForm($id);
+
+        return array(
+            'entity'      => $entity,
+            'delete_form' => $deleteForm->createView(),
+        );
+    }
+
+    /**
+     * Displays a form to edit an existing User entity.
+     *
+     * @Route("/{id}/edit", name="user_edit")
+     * @Method("GET")
+     * @Template()
+     */
+    public function editAction($id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $entity = $em->getRepository('AsseterUserBundle:User')->find($id);
+
+        if (!$entity) {
+            throw $this->createNotFoundException('Unable to find User entity.');
+        }
+
+        $editForm = $this->createEditForm($entity);
+        $deleteForm = $this->createDeleteForm($id);
+
+        return array(
+            'entity'      => $entity,
+            'edit_form'   => $editForm->createView(),
+            'delete_form' => $deleteForm->createView(),
+        );
+    }
+
+    /**
+    * Creates a form to edit a User entity.
+    *
+    * @param User $entity The entity
+    *
+    * @return \Symfony\Component\Form\Form The form
+    */
+    private function createEditForm(User $entity)
+    {
+        $form = $this->createForm(new UserType(), $entity, array(
+            'action' => $this->generateUrl('user_update', array('id' => $entity->getId())),
+            'method' => 'PUT',
+        ));
+
+        $form->add('submit', 'submit', array('label' => 'Update'));
+
+        return $form;
+    }
+    /**
+     * Edits an existing User entity.
+     *
+     * @Route("/{id}", name="user_update")
+     * @Method("PUT")
+     * @Template("AsseterUserBundle:User:edit.html.twig")
+     */
+    public function updateAction(Request $request, $id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $entity = $em->getRepository('AsseterUserBundle:User')->find($id);
+
+        if (!$entity) {
+            throw $this->createNotFoundException('Unable to find User entity.');
+        }
+
+        $deleteForm = $this->createDeleteForm($id);
+        $editForm = $this->createEditForm($entity);
+        $editForm->handleRequest($request);
+
+        if ($editForm->isValid()) {
+            $em->flush();
+
+            return $this->redirect($this->generateUrl('user_edit', array('id' => $id)));
+        }
+
+        return array(
+            'entity'      => $entity,
+            'edit_form'   => $editForm->createView(),
+            'delete_form' => $deleteForm->createView(),
+        );
+    }
+    /**
+     * Deletes a User entity.
+     *
+     * @Route("/{id}", name="user_delete")
+     * @Method("DELETE")
+     */
+    public function deleteAction(Request $request, $id)
+    {
+        $form = $this->createDeleteForm($id);
+        $form->handleRequest($request);
+
+        if ($form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $entity = $em->getRepository('AsseterUserBundle:User')->find($id);
+
+            if (!$entity) {
+                throw $this->createNotFoundException('Unable to find User entity.');
+            }
+
+            $em->remove($entity);
+            $em->flush();
+        }
+
+        return $this->redirect($this->generateUrl('user'));
+    }
+
+    /**
+     * Creates a form to delete a User entity by id.
+     *
+     * @param mixed $id The entity id
+     *
+     * @return \Symfony\Component\Form\Form The form
+     */
+    private function createDeleteForm($id)
+    {
+        return $this->createFormBuilder()
+            ->setAction($this->generateUrl('user_delete', array('id' => $id)))
+            ->setMethod('DELETE')
+            ->add('submit', 'submit', array('label' => 'Delete'))
+            ->getForm()
+        ;
+    }
 }

@@ -1,3 +1,19 @@
 .letter{
     color: red;
 }
+#user_passcode {
+    /*height: 80px;*/
+    padding-top: 5px;
+}
+
+.userEmailPasscode, .userNames {
+    margin: 10px !important;
+}
+
+.registrationForm{
+    text-align: center;
+}
+
+.headerInfo{
+    text-align: center;
+}

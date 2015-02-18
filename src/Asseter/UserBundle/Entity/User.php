@@ -1,196 +1,87 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: willsalazar
- * Date: 12/21/14
- * Time: 5:01 PM
- */
 
 namespace Asseter\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity @ORM\Table(name="users")
+ * User
+ *
+ * @ORM\Table(name="users")
+ * @ORM\Entity(repositoryClass="Asseter\UserBundle\Entity\UserRepository")
  */
-
 class User
 {
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
 
     /**
-     * @var int $id
-     * @ORM\id @ORM\Column(type="integer") @ORM\GeneratedValue
+     * @var string
+     *
+     * @ORM\Column(name="firstName", type="string", length=255)
      */
-    protected $id;
-    /**
-     * @var string $firstName
-     * @ORM\Column(type="string")
-     * @Assert\NotBlank()
-     * @Assert\Email()
-     */
-    protected $firstName;
-    /**
-     * @ORM\Column(type="string")
-     * @Assert\NotBlank()
-     * @var $lastName string
-     */
-    protected $lastName;
-    /**
-     * @ORM\Column(type="string")
-     * @Assert\NotBlank()
-     * @var $email string
-     */
-    protected $email;
-    /**
-     * @ORM\Column(type="string")
-     * @Assert\NotBlank()
-     * @var $passcode string
-     */
-    protected $encodedPasscode;
+    private $firstName;
 
     /**
-     * @var $salt string
+     * @var string
+     *
+     * @ORM\Column(name="lastName", type="string", length=255)
      */
-    protected $salt;
-    /**
-     * @ORM\Column(type="string")
-     * @Assert\NotBlank()
-     * @var $verificationCode string
-     */
-    protected $verificationCode;
-    /**
-     * @ORM\Column(type="integer")
-     * @var integer $active
-     */
-    protected $active;
+    private $lastName;
 
     /**
-     * @ORM\Column(type="string")
-     * @var string $role
+     * @var string
+     *
+     * @ORM\Column(name="email", type="string", length=255)
      */
-    protected $role;
+    private $email;
 
     /**
-     * @param string $firstName
-     * @param string $lastName
-     * @param string $email
-     * @param string $passcode
-     * @param string $verificationCode
-     * @param $role
-     * @throws \InvalidArgumentException
+     * @var string
+     *
+     * @ORM\Column(name="encodedPasscode", type="string", length=255)
      */
-    public function __construct($firstName, $lastName, $email, $passcode, $verificationCode, $role)
-    {
-        if ( is_null($firstName) ) {
-            throw new \InvalidArgumentException('First Name must not be empty');
-        }
-        $this->setFirstName($firstName);
-        if ( is_null($lastName) ) {
-            throw new \InvalidArgumentException('Last Name must not be empty');
-        }
-        $this->setLastName($lastName);
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            throw new \InvalidArgumentException('Not a valid email address.');
-        }
-        if ( is_null($email) ) {
-            throw new \InvalidArgumentException('Email must not be empty.');
-        }
-        $this->setEmail($email);
-        if ( is_null($passcode) ) {
-            throw new \InvalidArgumentException('Password must not be empty');
-        }
-        if ( strlen($passcode) < 5 ) {
-            throw new \InvalidArgumentException('Password must be longer than 5 characters');
-        }
-        $this->setEncodedPasscode($passcode);
-        $this->setVerificationCode($verificationCode);
-        $this->setActive(0);
-        $this->role = $role;
-    }
+    private $encodedPasscode;
 
     /**
-     * @param mixed $active
+     * @var string
+     *
+     * @ORM\Column(name="salt", type="string", length=255)
      */
-    public function setActive($active)
-    {
-        $this->active = $active;
-    }
+    private $salt;
 
     /**
-     * @return mixed
+     * @var string
+     *
+     * @ORM\Column(name="verificationCode", type="string", length=255)
      */
-    public function getActive()
-    {
-        return $this->active;
-    }
+    private $verificationCode;
 
     /**
-     * @param string $email
+     * @var boolean
+     *
+     * @ORM\Column(name="active", type="boolean")
      */
-    public function setEmail($email)
-    {
-        $this->email = $email;
-    }
+    private $active;
 
     /**
-     * @return string
+     * @var string
+     *
+     * @ORM\Column(name="role", type="string", length=255)
      */
-    public function getEmail()
-    {
-        return $this->email;
-    }
+    private $role;
+
 
     /**
-     * @return array
-     */
-    public function getRoles()
-    {
-        return $this->role;
-    }
-
-    /**
-     * @param string $encodedPasscode
-     */
-    public function setEncodedPasscode($encodedPasscode)
-    {
-        $this->encodedPasscode = $encodedPasscode;
-    }
-
-    /**
-     * @return string
-     */
-    public function getEncodedPasscode()
-    {
-        return $this->encodedPasscode;
-    }
-
-    /**
-     * @param string $firstName
-     */
-    public function setFirstName($firstName)
-    {
-        $this->firstName = $firstName;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFirstName()
-    {
-        return $this->firstName;
-    }
-
-    /**
-     * @param int $id
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
-
-    /**
-     * @return int
+     * Get id
+     *
+     * @return integer 
      */
     public function getId()
     {
@@ -198,15 +89,45 @@ class User
     }
 
     /**
+     * Set firstName
+     *
+     * @param string $firstName
+     * @return User
+     */
+    public function setFirstName($firstName)
+    {
+        $this->firstName = $firstName;
+
+        return $this;
+    }
+
+    /**
+     * Get firstName
+     *
+     * @return string 
+     */
+    public function getFirstName()
+    {
+        return $this->firstName;
+    }
+
+    /**
+     * Set lastName
+     *
      * @param string $lastName
+     * @return User
      */
     public function setLastName($lastName)
     {
         $this->lastName = $lastName;
+
+        return $this;
     }
 
     /**
-     * @return string
+     * Get lastName
+     *
+     * @return string 
      */
     public function getLastName()
     {
@@ -214,15 +135,68 @@ class User
     }
 
     /**
+     * Set email
+     *
+     * @param string $email
+     * @return User
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * Get email
+     *
+     * @return string 
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * Set encodedPasscode
+     *
+     * @param string $encodedPasscode
+     * @return User
+     */
+    public function setEncodedPasscode($encodedPasscode)
+    {
+        $this->encodedPasscode = $encodedPasscode;
+
+        return $this;
+    }
+
+    /**
+     * Get encodedPasscode
+     *
+     * @return string 
+     */
+    public function getEncodedPasscode()
+    {
+        return $this->encodedPasscode;
+    }
+
+    /**
+     * Set salt
+     *
      * @param string $salt
+     * @return User
      */
     public function setSalt($salt)
     {
         $this->salt = $salt;
+
+        return $this;
     }
 
     /**
-     * @return string
+     * Get salt
+     *
+     * @return string 
      */
     public function getSalt()
     {
@@ -230,20 +204,71 @@ class User
     }
 
     /**
+     * Set verificationCode
+     *
      * @param string $verificationCode
+     * @return User
      */
     public function setVerificationCode($verificationCode)
     {
         $this->verificationCode = $verificationCode;
+
+        return $this;
     }
 
     /**
-     * @return string
+     * Get verificationCode
+     *
+     * @return string 
      */
     public function getVerificationCode()
     {
         return $this->verificationCode;
     }
 
+    /**
+     * Set active
+     *
+     * @param boolean $active
+     * @return User
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
 
-} 
+        return $this;
+    }
+
+    /**
+     * Get active
+     *
+     * @return boolean 
+     */
+    public function getActive()
+    {
+        return $this->active;
+    }
+
+    /**
+     * Set role
+     *
+     * @param string $role
+     * @return User
+     */
+    public function setRole($role)
+    {
+        $this->role = $role;
+
+        return $this;
+    }
+
+    /**
+     * Get role
+     *
+     * @return string 
+     */
+    public function getRole()
+    {
+        return $this->role;
+    }
+}

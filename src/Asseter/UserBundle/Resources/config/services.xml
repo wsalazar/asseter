@@ -4,26 +4,35 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
-    <!--&lt;!&ndash;-->
+    <parameters>
+        <parameter key="asseter.db_manager.class">Asseter\UserBundle\Service\DatabaseManager</parameter>
+        <parameter key="asseter.email.class">Asseter\UserBundle\Service\EmailRegisterService</parameter>
+        <parameter key="asseter.password_encoder.class">Asseter\UserBundle\Service\Encoder</parameter>
+        <parameter key="tstService.class">NYUMC\TSTBundle\Service\TstService</parameter>
+        <parameter key="tst.twig.checkIfNewOrUpdated.class">NYUMC\TSTBundle\Twig\CheckIfNewOrUpdatedData</parameter>
+        <parameter key="tst.twig.checkForNewTraumaEvents.class">NYUMC\TSTBundle\Twig\CheckForNewTraumaEvents</parameter>
+        <parameter key="tst.twig.getEventTypes.class">NYUMC\TSTBundle\Twig\TraumaEventTypes</parameter>
+        <parameter key="tst.twig.getUserMomentByMoment.class">NYUMC\TSTBundle\Twig\MomentByMomentCreator</parameter>
+    </parameters>
+
     <services>
-        <service id="database_manager" class="Asseter\UserBundle\Service\DatabaseManager">
+        <service id="database_manager" class="%asseter.db_manager.class%">
             <argument type="service" id="doctrine.orm.entity_manager" />
             <!--<argument>plain_value</argument>-->
             <!--<argument>"@doctrine.orm.entity_manager"</argument>-->
             <!--<argument type="service" id="doctrine.orm.entity_manager" />-->
         </service>
-        <service id="user_register_email" class="Asseter\UserBundle\Service\EmailRegisterService">
+        <service id="asseter_email_manager" class="%asseter.email.class%">
             <!--<argument type="service" id="service_id" />-->
             <!--<argument>plain_value</argument>-->
             <!--<argument>"@doctrine.orm.entity_manager"</argument>-->
         </service>
-        <service id="password_encoder" class="Asseter\UserBundle\Service\Encoder">
-            <!--<argument type="service" id="service_id" />-->
-            <!--<argument>plain_value</argument>-->
+        <service id="password_encoder" class="%asseter.password_encoder.class%">
+            <argument type="service" id="service_id" />
             <argument>%cost%</argument>
         </service>
         <service id="user_manager" class="Asseter\UserBundle\Entity\User\UserManager">
-            <argument type="service" id="database_manager"/>
+            <!--<argument type="service" id="database_manager"/>-->
             <argument type="service" id="user_factory"/>
             <!--<argument>@database_manager</argument>-->
             <!--<argument>@user_factory</argument>-->
@@ -31,5 +40,4 @@
         <service id="user_factory" class="Asseter\UserBundle\Entity\User\UserFactory">
         </service>
     </services>
-    <!--&ndash;&gt;-->
 </container>

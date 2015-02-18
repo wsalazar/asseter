@@ -1,0 +1,40 @@
+{% extends 'AsseterUserBundle::layout.html.twig' %}
+{% block header %}
+    <header class="page-header headerInfo">Asseter - Login</header>
+{% endblock %}
+{% block body %}
+    {{ form_start(login) }}
+    {#<form action="{{ path('user_register_submit') }}" method="post" {{ form_enctype(user) }} >#}
+    <div class="row-fluid">
+        <div class="col-lg-12">
+            <div class="registrationForm">
+                <ul>
+                    {% for flashMessage in app.session.flashbag.get('notice') %}
+                        <li>{{ flashMessage }}</li>
+                    {% endfor %}
+                </ul>
+                <div class="form-inline">
+                    <div class="form-group userEmailPasscode">
+                        {{ form_label(login.email) }}
+                        {{ form_widget(login.email) }}
+                        {{ form_label(login.passcode) }}
+                        {{ form_widget(login.passcode) }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <a href="{{ path('user_register') }}">
+                        Back to Register
+                    </a>
+                    <a href="">
+                        <button class="btn btn-default" name="user[login]" id="user_login" type="submit">Login</button>
+                    </a>
+                </div>
+                <div class="form-group">
+                    {{ form_rest(login) }}
+                    {{ form_end(login) }}
+                </div>
+            </div>
+        </div>
+    </div>
+        {#<a href="{{ path('user_user_homepage') }}" id="login">Back to Login</a>#}
+{% endblock %}

@@ -1,30 +1,59 @@
 {% extends 'AsseterUserBundle::layout.html.twig' %}
-
+{% block javascript %}
+    {{ parent() }}
+{% endblock %}
+{% block header %}
+    <header class="page-header headerInfo">Asseter - Registration</header>
+{% endblock %}
 {% block body %}
-    <form action="{{ path('user_register_submit') }}" method="post" {{ form_enctype(user) }} >
-        <ul>
-            {% for flashMessage in app.session.flashbag.get('notice') %}
-                <li>{{ flashMessage }}</li>
-            {% endfor %}
-        </ul>
-        <div>
-            <label for="firstName">First Name: </label><input id="firstName" name="firstName" type="text" />
-            <label for="lastName">Last Name: </label><input id="lastName" name="lastName" type="text"  />
+    {{ form_start(register) }}
+    <div class="row-fluid">
+        <div class="col-lg-12">
+            <div class="registrationForm">
+                <ul>
+                    {% for flashMessage in app.session.flashbag.get('notice') %}
+                        <li>{{ flashMessage }}</li>
+                    {% endfor %}
+                </ul>
+                <div class="form-inline">
+                    <div class="form-group userNames">
+                        {{ form_label(register.firstName) }}
+                        {{ form_widget(register.firstName) }}
+                        {{ form_label(register.lastName) }}
+                        {{ form_widget(register.lastName) }}
+                    </div>
+                </div>
+                <div class="form-inline">
+                    <div class="form-group userEmailPasscode">
+                        {{ form_label(register.email) }}
+                        {{ form_widget(register.email) }}
+                        {{ form_label(register.passcode) }}
+                        {{ form_widget(register.passcode) }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <a href="">
+                        {#<button class="btn btn-default" name="user[register]" id="user_register" type="submit">Register</button>#}
+                        {{ form_label(register.register) }}
+                        {{ form_widget(register.register) }}
+                    </a>
+                    <a href="{{ path('user_login') }}" class="login-form">
+                        Login
+                    </a>
+                </div>
+                <div class="form-group">
+                    {{ form_rest(register) }}
+                    {{ form_end(register) }}
+                </div>
+            </div>
         </div>
-        <div>
-            <label for="email">E-mail: </label><input id="email" name="email" type="email"  />
-            <label for="passcode">Passcode: </label><input id="passcode" name="passcode" type="password"  />
-        </div>
-        <div>
-            <input type="hidden" name="_token" value="{{ csrf_token('user') }}">
-            <input id="register" name="register" value="Register" type="submit" />
-        </div>
-        <a href="{{ path('user_user_homepage') }}" id="login">Back to Login</a>
-
-        {#background: none repeat scroll 0 0 #448df6;#}
-        {#border: 3px solid #448df6;#}
-        {#color: #14c65e;#}
-        {#float: left;#}
-        {#margin-right: 10px;#}
-    </form>
+    </div>
+    <script>
+        $( document ).ready(function() {
+            $('.login-form').on('click', function(e){
+//                e.preventDefault();
+            });
+        });
+    </script>
+        {#<a href="{{ path('user_user_homepage') }}" id="login">Back to Login</a>#}
 {% endblock %}
